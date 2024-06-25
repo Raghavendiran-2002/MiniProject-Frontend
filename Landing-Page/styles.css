@@ -3,7 +3,7 @@ body {
 }
 
 .hero-section {
-    background: url('../images/thumbnail.png') no-repeat center center/cover;
+    background: url('../Landing-Page/images/thumbnail.png') no-repeat center center/cover;
     height: 87vh;
     color: #fff;
 }
