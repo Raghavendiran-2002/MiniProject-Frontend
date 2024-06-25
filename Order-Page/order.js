@@ -18,9 +18,10 @@ document.addEventListener("DOMContentLoaded", () => {
     .then((data) => {
       ordersContainer.innerHTML = "";
       data["$values"].forEach((order) => {
-        var cancelButtonDisabled = order.status == "Paid" ? "" : "disabled";
-        var payButtonDisabled = order.status == "Cancelled" ? "" : "disabled";
-
+        if (order.status != "pending") {
+          var cancelButtonDisabled = order.status == "Paid" ? "" : "disabled";
+          var payButtonDisabled = order.status == "Cancelled" ? "" : "disabled";
+        }
         const orderCard = document.createElement("div");
         orderCard.className = "col-md-6 order-card";
         orderCard.innerHTML = `
@@ -54,51 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document
           .getElementById("pay-now")
           .addEventListener("click", function () {
-            fetch(`${IP}/Payment?userId=${localStorage.getItem("username")}`, {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                orderID: parseInt(order.orderID),
-                amount: document.getElementById("amount").value,
-                paymentMethod: document.getElementById("payment-method").value,
-              }),
-            })
-              .then((response) => response.json())
-              .then((data) => {
-                if (data["paymentID"] === undefined) {
-                  document.querySelector(
-                    "#SuccessfullyPayment .modal-body"
-                  ).innerText = "Payment is unsuccessfully\n";
-                } else {
-                  document.querySelector(
-                    "#SuccessfullyPayment .modal-body"
-                  ).innerText =
-                    "Payment is successfully\nYour Payment Id : " +
-                    data["paymentID"];
-                }
-                var myModal = new bootstrap.Modal(
-                  document.getElementById("SuccessfullyPayment"),
-                  {
-                    keyboard: false,
-                  }
-                );
-                myModal.show();
-              })
-              .catch((error) => {
-                document.querySelector(
-                  "#SuccessfullyPayment .modal-body"
-                ).innerText = "Payment is unsuccessfully\n";
-                var myModal = new bootstrap.Modal(
-                  document.getElementById("SuccessfullyPayment"),
-                  {
-                    keyboard: false,
-                  }
-                );
-                myModal.show();
-              });
+            placeOrder(order);
           });
 
         // Cancel
@@ -134,3 +91,76 @@ document.addEventListener("DOMContentLoaded", () => {
         '<p class="text-danger">Failed to load orders.</p>';
     });
 });
+
+function placeOrder(order) {
+  var form = document.getElementById("payment-form");
+  var amountInput = document.getElementById("amount");
+  var paymentMethodInput = document.getElementById("payment-method");
+  var isValid = true;
+
+  amountInput.classList.remove("is-invalid");
+  paymentMethodInput.classList.remove("is-invalid");
+
+  if (!amountInput.value.trim()) {
+    amountInput.classList.add("is-invalid");
+    isValid = false;
+  }
+
+  if (!paymentMethodInput.value.trim()) {
+    paymentMethodInput.classList.add("is-invalid");
+    isValid = false;
+  }
+
+  if (isValid) {
+    var paymentModal = new bootstrap.Modal(document.getElementById("payment"));
+    paymentModal.hide();
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("No token found in localStorage");
+      return;
+    }
+    fetch(`${IP}/Payment?userId=${localStorage.getItem("username")}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        orderID: parseInt(order.orderID),
+        amount: document.getElementById("amount").value,
+        paymentMethod: document.getElementById("payment-method").value,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data["paymentID"] === undefined) {
+          document.querySelector(
+            "#SuccessfullyPayment .modal-body"
+          ).innerText = `Payment is unsuccessfully\n${data["message"]}`;
+        } else {
+          document.querySelector("#SuccessfullyPayment .modal-body").innerText =
+            "Payment is successfully\nYour Payment Id : " + data["paymentID"];
+        }
+        paymentModal.hide();
+        var myModal = new bootstrap.Modal(
+          document.getElementById("SuccessfullyPayment"),
+          {
+            keyboard: false,
+          }
+        );
+        myModal.show();
+      })
+      .catch((error) => {
+        document.querySelector("#SuccessfullyPayment .modal-body").innerText =
+          "Payment is unsuccessfully\n  " + data.message;
+        var myModal = new bootstrap.Modal(
+          document.getElementById("SuccessfullyPayment"),
+          {
+            keyboard: false,
+          }
+        );
+        myModal.show();
+      });
+    paymentModal.hide();
+  }
+}
