@@ -1,4 +1,5 @@
 var IP = "http://localhost:8000/api";
+
 document.addEventListener("DOMContentLoaded", function () {
   const urlParams = new URLSearchParams(window.location.search);
   const productId = urlParams.get("productId");
