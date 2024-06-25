@@ -1,5 +1,7 @@
 var IP = "http://localhost:8000/api";
 const username = localStorage.getItem("username");
+const token = localStorage.getItem("token");
+
 let OrderItem = [];
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -10,8 +12,7 @@ function fetchCartItems(username) {
   fetch(`${IP}/ShoppingCart/GetCartByUserId?Id=${username}`, {
     method: "GET",
     headers: {
-      // Authorization: `Bearer ${token}`,
-      Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBJZCI6IjEiLCJyb2xlIjoiQWRtaW4iLCJleHAiOjE3MTkzNzkzNDJ9.eCcwD3pdqz_WfQ6NGKLCM_DlitK3Y3Okv2FI3AywycY`,
+      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
   })
@@ -96,8 +97,7 @@ function updateTotalPrice(itemId, newQuantity, cartItemId, inputField) {
   fetch(`${IP}/ShoppingCart`, {
     method: "PUT",
     headers: {
-      // Authorization: `Bearer ${token}`,
-      Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBJZCI6IjEiLCJyb2xlIjoiQWRtaW4iLCJleHAiOjE3MTkzODY3MjB9.y74003VtcJN-BTpYFoX0ZCK-lH0JoZHIUDC2txUjBEU`,
+      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -127,10 +127,6 @@ function updateTotalPrice(itemId, newQuantity, cartItemId, inputField) {
 }
 
 function removeItem(itemId) {
-  OrderItem.push({
-    productID: item["product"].productID,
-    quantity: item.quantity,
-  });
   fetch(`${IP}/ShoppingCart?cartId=${itemId}`, {
     method: "DELETE",
     headers: {
@@ -171,6 +167,10 @@ function removeItem(itemId) {
 document
   .getElementById("place-order-now")
   .addEventListener("click", function () {
+    if (OrderItem.length == 0) {
+      alert("Cart is Empty");
+      return;
+    }
     fetch(`${IP}/Order?userId=${username}`, {
       method: "POST",
       headers: {
@@ -185,15 +185,19 @@ document
     })
       .then((response) => response.json())
       .then((data) => {
+        removeCartItem(username);
         document.querySelector(
           "#SuccessfullyPlaceOrder .modal-body"
         ).innerText =
           "your Order ID : " + data["orderID"] + " is Placed successfully";
 
-        var myModal = new bootstrap.Modal(document.getElementById("checkout"), {
-          keyboard: false,
-        });
-        myModal.show();
+        var checkoutModal = new bootstrap.Modal(
+          document.getElementById("checkout"),
+          {
+            keyboard: false,
+          }
+        );
+        checkoutModal.show();
       })
       .catch((error) => {
         document.querySelector(
@@ -203,3 +207,13 @@ document
         console.error("Error fetching data:", error);
       });
   });
+
+function removeCartItem(itemId) {
+  fetch(`${IP}/ShoppingCart/DeleteCartByUserId?Id=${itemId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+}
