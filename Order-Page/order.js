@@ -21,11 +21,13 @@ document.addEventListener("DOMContentLoaded", () => {
         orderCard.className = "col-md-6 order-card";
         orderCard.innerHTML = `
           <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Order #${order.orderID}</h5>
-              <p class="card-text">Date: ${order.orderDate}</p>
-              <p class="card-text">Total: $${order.totalAmount}</p>
-              <p class="text-end">Status: ${order.status}</p>
+            <div id="card-body" class="card-body">
+              <h5 class="card-title">Order #${order.orderID} </h5>
+              <p class="card-text"><b>Date: </b> ${order.orderDate}</p>
+              <p class="card-text"><b>Shipping Address: </b> $${order.shippingAddress}</p>
+
+              <p class="card-text"><b>Total: </b> $${order.totalAmount}</p>
+              <p class="text-end"><b>Status: </b> ${order.status}</p>
               <button class="btn btn-primary" id="cancel-${order.orderID}">Cancel Order</button>
             </div>
           </div>

@@ -50,6 +50,20 @@ body {
 }
 
 @media (max-width: 576px) {
+    .navbarCustom {
+        flex-direction: column;
+        overflow: hidden;
+    }
+    .navbarCustom .navbar-nav {
+        flex-direction: column;
+        width: 100%;
+    }
+    .navbarCustom .navbar-nav .nav-item {
+        width: 100%;
+    }
+    .navbarCustom .navbar-collapse {
+        width: 100%;
+    }
     .hero-section {
         height: 40vh;
     }
