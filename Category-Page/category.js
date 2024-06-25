@@ -11,6 +11,21 @@ document.addEventListener("DOMContentLoaded", function () {
     console.error("No token found in localStorage");
     return;
   }
+  fetch(`${IP}/Category/ById?Id=${categoryId}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => response.json())
+    .then((categories) => {
+      var cat = categories.categoryName + " " + categories.description;
+      document.querySelector(".category-container").innerHTML = "";
+      document.querySelector(".category-container").innerHTML = `
+      <h1 class="mb-4">  ${categories.categoryName}  </h1>
+        <p>  ${categories.description} </p>`;
+    });
   fetch(`${IP}/Product/FilterCategoryId?categoryId=${categoryId}`, {
     method: "GET",
     headers: {
