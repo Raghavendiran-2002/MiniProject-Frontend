@@ -54,7 +54,7 @@ async function validateForm(event) {
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.role);
       localStorage.setItem("username", data.userID);
-      window.location.href = "../home/home.html";
+      window.location.href = "../Home-Page/home.html";
     } catch (error) {
       console.error("Error:", error);
       document.getElementById("incorrectUsernamePassword").innerText =
