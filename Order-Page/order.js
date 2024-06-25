@@ -1,4 +1,5 @@
 var IP = "http://localhost:8000/api";
+
 document.addEventListener("DOMContentLoaded", () => {
   const ordersContainer = document.getElementById("orders-container");
   const token = localStorage.getItem("token");
@@ -17,6 +18,9 @@ document.addEventListener("DOMContentLoaded", () => {
     .then((data) => {
       ordersContainer.innerHTML = "";
       data["$values"].forEach((order) => {
+        var cancelButtonDisabled = order.status == "Paid" ? "" : "disabled";
+        var payButtonDisabled = order.status == "Cancelled" ? "" : "disabled";
+
         const orderCard = document.createElement("div");
         orderCard.className = "col-md-6 order-card";
         orderCard.innerHTML = `
@@ -25,17 +29,16 @@ document.addEventListener("DOMContentLoaded", () => {
               <h5 class="card-title">Order #${order.orderID} </h5>
               <p class="card-text"><b>Date: </b> ${order.orderDate}</p>
               <p class="card-text"><b>Shipping Address: </b> $${order.shippingAddress}</p>
-
               <p class="card-text"><b>Total: </b> $${order.totalAmount}</p>
-              <p class="text-end"><b>Status: </b> ${order.status}</p>
-              <button class="btn btn-danger" id="cancel-${order.orderID}">Cancel Order</button>
-              <button class="btn btn-success" id="pay-${order.orderID}">Pay Order</button>
-
+              <p class="text-end" id="status-${order.orderID}"><b>Status: </b> ${order.status}</p>
+              <button class="btn btn-danger ${cancelButtonDisabled}" id="cancel-${order.orderID}">Cancel Order</button>
+              <button class="btn btn-success ${payButtonDisabled}" id="pay-${order.orderID}">Pay Order</button>
             </div>
           </div>
         `;
         ordersContainer.appendChild(orderCard);
 
+        // Payment
         document
           .getElementById(`pay-${order.orderID}`)
           .addEventListener("click", function () {
@@ -47,6 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
             );
             myModal.show();
           });
+
         document
           .getElementById("pay-now")
           .addEventListener("click", function () {
@@ -62,31 +66,42 @@ document.addEventListener("DOMContentLoaded", () => {
                 paymentMethod: document.getElementById("payment-method").value,
               }),
             })
-              .then((response) => {
-                if (response.ok) {
+              .then((response) => response.json())
+              .then((data) => {
+                if (data["paymentID"] === undefined) {
                   document.querySelector(
-                    "#SuccessfullyPlaceOrder .modal-body"
+                    "#SuccessfullyPayment .modal-body"
+                  ).innerText = "Payment is unsuccessfully\n";
+                } else {
+                  document.querySelector(
+                    "#SuccessfullyPayment .modal-body"
                   ).innerText =
-                    "your Order ID : " +
-                    data["orderID"] +
-                    " is Placed successfully";
-
-                  var myModal = new bootstrap.Modal(
-                    document.getElementById("payment"),
-                    {
-                      keyboard: false,
-                    }
-                  );
-                  myModal.show();
-                  return response.json();
+                    "Payment is successfully\nYour Payment Id : " +
+                    data["paymentID"];
                 }
-                throw new Error("Failed to cancel payment");
+                var myModal = new bootstrap.Modal(
+                  document.getElementById("SuccessfullyPayment"),
+                  {
+                    keyboard: false,
+                  }
+                );
+                myModal.show();
               })
-              .then((data) => {})
               .catch((error) => {
-                console.error("Error cancelling order:", error);
+                document.querySelector(
+                  "#SuccessfullyPayment .modal-body"
+                ).innerText = "Payment is unsuccessfully\n";
+                var myModal = new bootstrap.Modal(
+                  document.getElementById("SuccessfullyPayment"),
+                  {
+                    keyboard: false,
+                  }
+                );
+                myModal.show();
               });
           });
+
+        // Cancel
         document
           .getElementById(`cancel-${order.orderID}`)
           .addEventListener("click", function () {
@@ -104,7 +119,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 throw new Error("Failed to cancel order");
               })
               .then((data) => {
-                console.log("Order cancelled:", data);
+                document.getElementById(`status-${order.orderID}`).innerText =
+                  "Status: " + data["status"];
               })
               .catch((error) => {
                 console.error("Error cancelling order:", error);
