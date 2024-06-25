@@ -22,6 +22,16 @@ document.addEventListener("DOMContentLoaded", () => {
           var cancelButtonDisabled = order.status == "Paid" ? "" : "disabled";
           var payButtonDisabled = order.status == "Cancelled" ? "" : "disabled";
         }
+        let orderItemsHtml = "";
+        order.orderItems["$values"].forEach((item) => {
+          orderItemsHtml += `
+            <p class="card-text">
+              <b>Product ID:</b> ${item.productID}, 
+              <b>Quantity:</b> ${item.quantity}, 
+              <b>Unit Price:</b> $${item.unitPrice}
+            </p>`;
+        });
+
         const orderCard = document.createElement("div");
         orderCard.className = "col-md-6 order-card";
         orderCard.innerHTML = `
@@ -31,12 +41,12 @@ document.addEventListener("DOMContentLoaded", () => {
               <p class="card-text"><b>Date: </b> ${order.orderDate}</p>
               <p class="card-text"><b>Shipping Address: </b> $${order.shippingAddress}</p>
               <p class="card-text"><b>Total: </b> $${order.totalAmount}</p>
+              ${orderItemsHtml}
               <p class="text-end" id="status-${order.orderID}"><b>Status: </b> ${order.status}</p>
               <button class="btn btn-danger ${cancelButtonDisabled}" id="cancel-${order.orderID}">Cancel Order</button>
               <button class="btn btn-success ${payButtonDisabled}" id="pay-${order.orderID}">Pay Order</button>
             </div>
-          </div>
-        `;
+          </div>`;
         ordersContainer.appendChild(orderCard);
 
         // Payment
