@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
       <div class="card">        
             <div class="row g-0">
                   <div class="col-md-4">
-                    <img src="${product.imageUrl}" class="img-fluid rounded-start" alt="No Product Image">
+                    <img src="${product.imageUrl}" class="ms-5 img-fluid rounded-start" alt="No Product Image">
                   </div>
                 <div class="col-md-8">
                     <div class="card-body">
@@ -48,6 +48,9 @@ document.addEventListener("DOMContentLoaded", function () {
             <div class="mt-5 px-5" py-5>
               <h5>Review</h5>
                     <p id="review-container"></p>
+                    <div class="text-center">
+                      <p id="review-error"> </p>
+                    </div> 
                 </div>
             </div>
       </div> `;
@@ -106,7 +109,10 @@ function GetReviews(productId) {
   })
     .then((response) => response.json())
     .then((reviews) => {
-      console.log(reviews["$values"]);
+      if (reviews["$values"].length == 0) {
+        document.getElementById("review-error").innerHTML = "No Reviews Found";
+      }
+
       document.getElementById("review-container").innerHTML = reviews[
         "$values"
       ].map(
