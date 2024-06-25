@@ -33,6 +33,46 @@
         <div id="orders-container" class="row">
         </div>
     </div>
+    <footer class="mt-5 footer bg-light py-3">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2024 PharmaStore. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div class="modal fade" id="payment" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">Place Order</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form>
+                <input id="amount" type="text" class="mb-2 form-control" placeholder="Amount">
+                <input id="payment-method" type="text" class="form-control" placeholder="Payment Method">
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="button"  id="pay-now" class="btn btn-primary" data-bs-target="#SuccessfullyPlaceOrder" data-bs-toggle="modal">Pay order</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal fade" id="SuccessfullyPlaceOrder" aria-hidden="true" aria-labelledby="SuccessfullyPlaceOrder" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalToggleLabel2">Place Order</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              Order Placed Successfully
+            </div>
+          </div>
+        </div>
+      </div>
     <script src="order.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

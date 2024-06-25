@@ -28,12 +28,65 @@ document.addEventListener("DOMContentLoaded", () => {
 
               <p class="card-text"><b>Total: </b> $${order.totalAmount}</p>
               <p class="text-end"><b>Status: </b> ${order.status}</p>
-              <button class="btn btn-primary" id="cancel-${order.orderID}">Cancel Order</button>
+              <button class="btn btn-danger" id="cancel-${order.orderID}">Cancel Order</button>
+              <button class="btn btn-success" id="pay-${order.orderID}">Pay Order</button>
+
             </div>
           </div>
         `;
         ordersContainer.appendChild(orderCard);
 
+        document
+          .getElementById(`pay-${order.orderID}`)
+          .addEventListener("click", function () {
+            var myModal = new bootstrap.Modal(
+              document.getElementById("payment"),
+              {
+                keyboard: false,
+              }
+            );
+            myModal.show();
+          });
+        document
+          .getElementById("pay-now")
+          .addEventListener("click", function () {
+            fetch(`${IP}/Payment?userId=${localStorage.getItem("username")}`, {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                orderID: parseInt(order.orderID),
+                amount: document.getElementById("amount").value,
+                paymentMethod: document.getElementById("payment-method").value,
+              }),
+            })
+              .then((response) => {
+                if (response.ok) {
+                  document.querySelector(
+                    "#SuccessfullyPlaceOrder .modal-body"
+                  ).innerText =
+                    "your Order ID : " +
+                    data["orderID"] +
+                    " is Placed successfully";
+
+                  var myModal = new bootstrap.Modal(
+                    document.getElementById("payment"),
+                    {
+                      keyboard: false,
+                    }
+                  );
+                  myModal.show();
+                  return response.json();
+                }
+                throw new Error("Failed to cancel payment");
+              })
+              .then((data) => {})
+              .catch((error) => {
+                console.error("Error cancelling order:", error);
+              });
+          });
         document
           .getElementById(`cancel-${order.orderID}`)
           .addEventListener("click", function () {
