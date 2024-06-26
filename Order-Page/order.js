@@ -7,6 +7,10 @@ document.addEventListener("DOMContentLoaded", () => {
     console.error("No token found in localStorage");
     return;
   }
+  fetchOrders(token, ordersContainer);
+});
+
+function fetchOrders(token, ordersContainer) {
   fetch(`${IP}/Order/GetUserOrders?userId=1`, {
     method: "GET",
     headers: {
@@ -15,94 +19,135 @@ document.addEventListener("DOMContentLoaded", () => {
     },
   })
     .then((response) => response.json())
-    .then((data) => {
-      ordersContainer.innerHTML = "";
-      data["$values"].forEach((order) => {
-        if (order.status != "pending") {
-          var cancelButtonDisabled = order.status == "Paid" ? "" : "disabled";
-          var payButtonDisabled = order.status == "Cancelled" ? "" : "disabled";
-        }
-        let orderItemsHtml = "";
-        order.orderItems["$values"].forEach((item) => {
-          orderItemsHtml += `
-          <div class="card mx-3 my-3 px-1 py-1 text-center">
-                <p class="card-text">
-                <b>Product ID:</b> ${item.productID}
-                <b>Quantity:</b> ${item.quantity}
-                <b>Unit Price:</b> $${item.unitPrice}
-                </p>
-            </div>`;
-        });
-
-        const orderCard = document.createElement("div");
-        orderCard.className = "col-md-6 order-card";
-        orderCard.innerHTML = `
-          <div class="card">
-            <div id="card-body" class="card-body">
-              <h5 class="card-title">Order #${order.orderID} </h5>
-              <p class="card-text"><b>Date: </b> ${order.orderDate}</p>
-              <p class="card-text"><b>Shipping Address: </b> $${order.shippingAddress}</p>
-              <p class="card-text"><b>Total: </b> $${order.totalAmount}</p>
-              ${orderItemsHtml}
-              <p class="text-end" id="status-${order.orderID}"><b>Status: </b> ${order.status}</p>
-              <button class="btn btn-danger ${cancelButtonDisabled}" id="cancel-${order.orderID}">Cancel Order</button>
-              <button class="btn btn-success ${payButtonDisabled}" id="pay-${order.orderID}">Pay Order</button>
-            </div>
-          </div>`;
-        ordersContainer.appendChild(orderCard);
-
-        // Payment
-        document
-          .getElementById(`pay-${order.orderID}`)
-          .addEventListener("click", function () {
-            var myModal = new bootstrap.Modal(
-              document.getElementById("payment"),
-              {
-                keyboard: false,
-              }
-            );
-            myModal.show();
-          });
-
-        document
-          .getElementById("pay-now")
-          .addEventListener("click", function () {
-            placeOrder(order);
-          });
-
-        // Cancel
-        document
-          .getElementById(`cancel-${order.orderID}`)
-          .addEventListener("click", function () {
-            fetch(`${IP}/Order?orderId=${order.orderID}`, {
-              method: "DELETE",
-              headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
-              },
-            })
-              .then((response) => {
-                if (response.ok) {
-                  return response.json();
-                }
-                throw new Error("Failed to cancel order");
-              })
-              .then((data) => {
-                document.getElementById(`status-${order.orderID}`).innerText =
-                  "Status: " + data["status"];
-              })
-              .catch((error) => {
-                console.error("Error cancelling order:", error);
-              });
-          });
-      });
-    })
+    .then((data) => renderOrders(data, ordersContainer, token))
     .catch((error) => {
       console.error("Error fetching orders:", error);
       ordersContainer.innerHTML =
         '<p class="text-danger">Failed to load orders.</p>';
     });
-});
+}
+
+function renderOrders(data, ordersContainer, token) {
+  ordersContainer.innerHTML = "";
+  data["$values"].forEach((order) => {
+    renderOrder(order, ordersContainer, token);
+  });
+}
+
+function renderOrder(order, ordersContainer, token) {
+  if (order.status != "pending") {
+    var cancelButtonDisabled = order.status == "Paid" ? "" : "disabled";
+    var payButtonDisabled = order.status == "Cancelled" ? "" : "disabled";
+  }
+  let orderItemsHtml = "";
+  order.orderItems["$values"].forEach((item) => {
+    orderItemsHtml += `
+      <div class="card mx-3 my-3 px-1 py-1 text-center" id="order-${order.orderID}-product-${item.productID}">
+          <p class="card-text">
+              <b>Product ID:</b> ${item.productID}
+              <b>Quantity:</b> ${item.quantity}
+              <b>Unit Price:</b> $${item.unitPrice} 
+          </p>
+      </div>`;
+  });
+
+  const orderCard = document.createElement("div");
+  orderCard.className = "col-md-6 order-card";
+  orderCard.innerHTML = `
+    <div class="card">
+      <div id="card-body" class="card-body">
+        <h5 class="card-title">Order #${order.orderID} </h5>
+        <p class="card-text"><b>Date: </b> ${order.orderDate}</p>
+        <p class="card-text"><b>Shipping Address: </b> $${order.shippingAddress}</p>
+        <p class="card-text"><b>Total: </b> $${order.totalAmount}</p>
+        ${orderItemsHtml}
+        <p class="text-end" id="status-${order.orderID}"><b>Status: </b> ${order.status}</p>
+        <button class="btn btn-danger ${cancelButtonDisabled}" id="cancel-${order.orderID}">Cancel Order</button>
+        <button class="btn btn-success ${payButtonDisabled}" id="pay-${order.orderID}">Pay Order</button>
+      </div>
+    </div>`;
+
+  ordersContainer.appendChild(orderCard);
+  setupOrderItemEventListeners(order);
+  setupPaymentAndCancellation(order, token);
+}
+
+function setupOrderItemEventListeners(order) {
+  order.orderItems["$values"].forEach((item) => {
+    document
+      .getElementById(`order-${order.orderID}-product-${item.productID}`)
+      .addEventListener("click", () => reviewProduct(item));
+  });
+}
+
+function reviewProduct(item) {
+  var reviewModal = new bootstrap.Modal(
+    document.getElementById("reviewModal"),
+    { keyboard: false }
+  );
+  reviewModal.show();
+  document.getElementById("reviewForm").onsubmit = (e) =>
+    submitReview(e, item, reviewModal);
+}
+
+function submitReview(e, item, reviewModal) {
+  e.preventDefault();
+  var reviewText = document.getElementById("reviewText").value;
+  var rating = document.getElementById("rating").value;
+
+  if (rating < 0 || rating > 5 || !reviewText.trim()) {
+    alert("Please enter a valid review and rating between 0 and 5.");
+    return;
+  }
+
+  fetch(`${IP}/Review?userId=${localStorage.getItem("username")}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    body: JSON.stringify({
+      productID: parseInt(item.productID),
+      comment: reviewText,
+      rating: parseInt(rating),
+    }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      reviewModal.hide();
+      var successModal = new bootstrap.Modal(
+        document.getElementById("reviewSuccessModal"),
+        {
+          keyboard: false,
+        }
+      );
+      successModal.show();
+    })
+    .catch((error) => {
+      console.error("Error submitting review:", error);
+    });
+}
+
+function setupPaymentAndCancellation(order, token) {
+  document
+    .getElementById(`pay-${order.orderID}`)
+    .addEventListener("click", () => showPaymentModal(order));
+
+  document
+    .getElementById("pay-now")
+    .addEventListener("click", () => placeOrder(order));
+
+  document
+    .getElementById(`cancel-${order.orderID}`)
+    .addEventListener("click", () => cancelOrder(order, token));
+}
+
+function showPaymentModal(order) {
+  var myModal = new bootstrap.Modal(document.getElementById("payment"), {
+    keyboard: false,
+  });
+  myModal.show();
+}
 
 function placeOrder(order) {
   var form = document.getElementById("payment-form");
@@ -175,4 +220,27 @@ function placeOrder(order) {
       });
     paymentModal.hide();
   }
+}
+
+function cancelOrder(order, token) {
+  fetch(`${IP}/Order?orderId=${order.orderID}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error("Failed to cancel order");
+    })
+    .then((data) => {
+      document.getElementById(`status-${order.orderID}`).innerText =
+        "Status: " + data["status"];
+    })
+    .catch((error) => {
+      console.error("Error cancelling order:", error);
+    });
 }
