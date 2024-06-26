@@ -1,5 +1,9 @@
 var IP = "http://localhost:8000/api";
 
+// document.addEventListener("DOMContentLoaded", function () {
+//   localStorage.clear();
+// });
+
 async function validateForm(event) {
   event.preventDefault();
 
