@@ -25,11 +25,13 @@ document.addEventListener("DOMContentLoaded", () => {
         let orderItemsHtml = "";
         order.orderItems["$values"].forEach((item) => {
           orderItemsHtml += `
-            <p class="card-text">
-              <b>Product ID:</b> ${item.productID}, 
-              <b>Quantity:</b> ${item.quantity}, 
-              <b>Unit Price:</b> $${item.unitPrice}
-            </p>`;
+          <div class="card mx-3 my-3 px-1 py-1 text-center">
+                <p class="card-text">
+                <b>Product ID:</b> ${item.productID}
+                <b>Quantity:</b> ${item.quantity}
+                <b>Unit Price:</b> $${item.unitPrice}
+                </p>
+            </div>`;
         });
 
         const orderCard = document.createElement("div");
