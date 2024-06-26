@@ -8,13 +8,16 @@ document.addEventListener("DOMContentLoaded", () => {
     console.error("No token found in localStorage");
     return;
   }
-  fetch(`${IP}/Payment/AllPayments`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  })
+  fetch(
+    `${IP}/Payment/PaymentByUser?userId=${localStorage.getItem("username")}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  )
     .then((response) => response.json())
     .then((data) => {
       paymentsContainer.innerHTML = "";

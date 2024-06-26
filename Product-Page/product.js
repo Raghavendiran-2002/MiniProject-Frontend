@@ -94,7 +94,7 @@ document.addEventListener("DOMContentLoaded", function () {
             },
           });
           const data = await response.json();
-          console.log(data);
+          alert("Successfully Added");
         });
 
       document.getElementById("add").addEventListener("click", function () {

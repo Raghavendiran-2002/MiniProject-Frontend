@@ -132,8 +132,7 @@ function removeItem(itemId) {
   fetch(`${IP}/ShoppingCart?cartId=${itemId}`, {
     method: "DELETE",
     headers: {
-      // Authorization: `Bearer ${token}`,
-      Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBJZCI6IjEiLCJyb2xlIjoiQWRtaW4iLCJleHAiOjE3MTkzNzkzNDJ9.eCcwD3pdqz_WfQ6NGKLCM_DlitK3Y3Okv2FI3AywycY`,
+      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
   })
@@ -176,8 +175,8 @@ document
     fetch(`${IP}/Order?userId=${username}`, {
       method: "POST",
       headers: {
-        // Authorization: `Bearer ${token}`,
-        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBJZCI6IjEiLCJyb2xlIjoiQWRtaW4iLCJleHAiOjE3MTkzNzkzNDJ9.eCcwD3pdqz_WfQ6NGKLCM_DlitK3Y3Okv2FI3AywycY`,
+        Authorization: `Bearer ${token}`,
+        // Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbXBJZCI6IjEiLCJyb2xlIjoiQWRtaW4iLCJleHAiOjE3MTkzNzkzNDJ9.eCcwD3pdqz_WfQ6NGKLCM_DlitK3Y3Okv2FI3AywycY`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -185,7 +184,13 @@ document
         orderItems: OrderItem,
       }),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          document.querySelector(
+            "#SuccessfullyPlaceOrder .modal-body"
+          ).innerText = response.data.message;
+        }
+      })
       .then((data) => {
         removeCartItem(username);
         document.querySelector(
@@ -204,7 +209,7 @@ document
       .catch((error) => {
         document.querySelector(
           "#SuccessfullyPlaceOrder .modal-body"
-        ).innerText = "Error";
+        ).innerText = error.data.message;
 
         console.error("Error fetching data:", error);
       });

@@ -11,13 +11,16 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function fetchOrders(token, ordersContainer) {
-  fetch(`${IP}/Order/GetUserOrders?userId=1`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  })
+  fetch(
+    `${IP}/Order/GetUserOrders?userId=${localStorage.getItem("username")}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  )
     .then((response) => response.json())
     .then((data) => renderOrders(data, ordersContainer, token))
     .catch((error) => {
