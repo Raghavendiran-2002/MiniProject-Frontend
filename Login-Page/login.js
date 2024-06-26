@@ -1,4 +1,4 @@
-var IP = "http://localhost:8000/api";
+var IP = "https://backend.raghavendiran.cloud/api";
 
 document.addEventListener("DOMContentLoaded", function () {
   localStorage.clear();
@@ -64,7 +64,7 @@ async function validateForm(event) {
       } else if (data.role === "User") {
         window.location.href = "../Home-Page/home.html";
       } else {
-        window.location.href = "../Landing-Page/landing.html";
+        window.location.href = "../index.html";
       }
     } catch (error) {
       console.error("Error:", error);

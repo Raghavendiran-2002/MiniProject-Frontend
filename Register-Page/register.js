@@ -1,4 +1,6 @@
-var IP="http://localhost:8000/api";
+// var IP="http://localhost:8000/api";
+var IP = "https://backend.raghavendiran.cloud/api";
+
 
 async function validateForm(event) {
   event.preventDefault();

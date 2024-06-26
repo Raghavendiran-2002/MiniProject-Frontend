@@ -1,5 +1,5 @@
-var IP = "http://localhost:8000/api";
-
+// var IP = "http://localhost:8000/api";
+var IP = "https://backend.raghavendiran.cloud/api";
 document.addEventListener("DOMContentLoaded", () => {
   const ordersContainer = document.getElementById("orders-container");
   const token = localStorage.getItem("token");
