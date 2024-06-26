@@ -2,6 +2,7 @@
 var IP = "https://backend.raghavendiran.cloud/api";
 
 const token = localStorage.getItem("token");
+const userId = localStorage.getItem("username");
 
 document.addEventListener("DOMContentLoaded", async () => {
   if (!token) {
@@ -9,7 +10,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     window.location.href = "../Login-Page/login.html";
     return;
   }
-  const userId = localStorage.getItem("username");
   if (userId) {
     await fetchUserData(userId);
   }
@@ -45,7 +45,6 @@ function populateFormData(userData) {
 
 async function updateProfile(event) {
   event.preventDefault();
-  const userId = new URLSearchParams(window.location.search).get("userid");
   const updatedData = {
     userId: userId,
     username: document.getElementById("username").value.trim(),
