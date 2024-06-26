@@ -1,8 +1,8 @@
 var IP = "http://localhost:8000/api";
 
-// document.addEventListener("DOMContentLoaded", function () {
-//   localStorage.clear();
-// });
+document.addEventListener("DOMContentLoaded", function () {
+  localStorage.clear();
+});
 
 async function validateForm(event) {
   event.preventDefault();
@@ -56,9 +56,16 @@ async function validateForm(event) {
 
       const data = await response.json();
       localStorage.setItem("token", data.token);
-      localStorage.setItem("role", data.role);
+      const role = localStorage.setItem("role", data.role);
       localStorage.setItem("username", data.userID);
-      window.location.href = "../Home-Page/home.html";
+
+      if (data.role === "Admin") {
+        window.location.href = "../Admin-Page/admin-page.html";
+      } else if (data.role === "User") {
+        window.location.href = "../Home-Page/home.html";
+      } else {
+        window.location.href = "../Landing-Page/landing.html";
+      }
     } catch (error) {
       console.error("Error:", error);
       document.getElementById("incorrectUsernamePassword").innerText =

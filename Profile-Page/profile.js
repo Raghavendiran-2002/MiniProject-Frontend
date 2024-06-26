@@ -2,14 +2,12 @@ var IP = "http://localhost:8000/api";
 const token = localStorage.getItem("token");
 
 document.addEventListener("DOMContentLoaded", async () => {
-  const params = new URLSearchParams(window.location.search);
-
   if (!token) {
     console.error("No token found in localStorage");
     window.location.href = "../Login-Page/login.html";
     return;
   }
-  const userId = params.get("userid");
+  const userId = localStorage.getItem("username");
   if (userId) {
     await fetchUserData(userId);
   }

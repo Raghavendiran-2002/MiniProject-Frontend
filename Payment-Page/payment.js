@@ -38,6 +38,6 @@ document.addEventListener("DOMContentLoaded", () => {
     .catch((error) => {
       console.error("Error fetching payments:", error);
       paymentsContainer.innerHTML =
-        '<p class="text-danger">Failed to load payments.</p>';
+        '<p class="text-danger">No payments available.</p>';
     });
 });
