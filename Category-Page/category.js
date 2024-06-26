@@ -43,7 +43,13 @@ document.addEventListener("DOMContentLoaded", function () {
         card.classList.add("col-md-4", "mb-4");
         card.innerHTML = `
                     <div class="card">
-                        <img src="${product.imageUrl}" class="card-img-top" alt="${product.productName}">
+                        <img src="${
+                          product.imageUrl
+                            ? product.imageUrl
+                            : "https://via.placeholder.com/300x200.png?text=Product"
+                        }" class="card-img-top" alt="${
+          product.productName
+        }" style="height: 300px;">
                         <div class="card-body">
                             <h5 class="card-title">${product.productName}</h5>
                             <p class="card-text">${product.description}</p>

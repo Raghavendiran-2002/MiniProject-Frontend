@@ -29,18 +29,28 @@ document.addEventListener("DOMContentLoaded", function () {
       <div class="card">        
             <div class="row g-0">
                   <div class="col-md-4">
-                    <img src="${product.imageUrl}" class="ms-5 img-fluid rounded-start" alt="No Product Image">
+                    <img src="${
+                      product.imageUrl
+                        ? product.imageUrl
+                        : "https://via.placeholder.com/300x200.png?text=Product"
+                    }" class="mt-5 ms-5 img-fluid rounded-start" alt="No Product Image" style="width: 300px; height: 200px;">
                   </div>
-                <div class="col-md-8">
+                <div class="mt-5 col-md-8">
                     <div class="card-body">
-                        <h5 class="card-title" id="product-title">${product.productName}</h5>
-                        <p class="card-text" id="product-description">${product.description}</p>
-                        <h6 class="card-subtitle mb-2 text-muted" id="product-price">₹${product.price}</h6>
+                        <h5 class="card-title" id="product-title">${
+                          product.productName
+                        }</h5>
+                        <p class="card-text" id="product-description">${
+                          product.description
+                        }</p>
+                        <h6 class="card-subtitle mb-2 text-muted" id="product-price">₹${
+                          product.price
+                        }</h6>
                         <div class="col">
-                          <button id="remove" class="btn border">-</button>
-                          <button id="cartItemNumber" class="btn border">0</button>
-                          <button id="add" class="btn border">+</button>
-                          <button id="addCartToItem"  class="btn btn-secondary ms-4">Add to Cart</button>
+                          <button id="remove" class="mt-2 btn border">-</button>
+                          <button id="cartItemNumber" class="mt-2 btn border">0</button>
+                          <button id="add" class="mt-2 btn border">+</button>
+                          <button id="addCartToItem"  class="mt-2 btn btn-secondary ms-4">Add to Cart</button>
                         </div>
                         <p id="quantity-insufficient" style="color: red;"> </p>
                     </div>

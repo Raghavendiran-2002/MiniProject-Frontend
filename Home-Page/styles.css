@@ -35,6 +35,23 @@ body {
     transform: scale(1.05);
 }
 
+#product-grid, #category-grid {
+    max-height: 400px; 
+    overflow-y: auto; 
+}
+.product-cart {
+    flex: 0 0 auto; 
+    width: 300px;
+    margin-right: 10px; 
+  }
+
+.category-cart
+  {
+    flex: 0 0 auto; 
+    width: 300px; 
+    margin-right: 10px;
+  }
+
 @media (max-width: 768px) {
     .hero-section {
         height: 50vh;

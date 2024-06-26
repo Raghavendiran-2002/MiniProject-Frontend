@@ -100,7 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <img src=" ${
             product.imageUrl
               ? product.imageUrl
-              : "https://via.placeholder.com/300x200"
+              : "https://via.placeholder.com/300x200.png?text=Product"
           }"
           class="card-img-top" alt="https://via.placeholder.com/300x200" style="width:100%;height:65%;">
           <div class="card-body">
@@ -125,7 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <img src=" ${
             category.imageUrl
               ? category.imageUrl
-              : "https://via.placeholder.com/300x200"
+              : "https://via.placeholder.com/300x200.png?text=Category"
           }"
           class="card-img-top" alt="https://via.placeholder.com/300x200" style="width:100%;height:65%;">
           <div class="card-body">
@@ -174,6 +174,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // Initial fetch of products
   fetchProducts();
   fetchCategories();
 });
