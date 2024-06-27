@@ -1,5 +1,6 @@
 // var IP = "http://localhost:8000/api";
 var IP = "https://backend.raghavendiran.cloud/api";
+
 document.addEventListener("DOMContentLoaded", () => {
   const ordersContainer = document.getElementById("orders-container");
   const token = localStorage.getItem("token");
@@ -38,41 +39,47 @@ function renderOrders(data, ordersContainer, token) {
 }
 
 function renderOrder(order, ordersContainer, token) {
-  if (order.status != "pending") {
-    var cancelButtonDisabled = order.status == "Paid" ? "" : "disabled";
-    var payButtonDisabled = order.status == "Cancelled" ? "" : "disabled";
-  }
-  let orderItemsHtml = "";
-  order.orderItems["$values"].forEach((item) => {
-    orderItemsHtml += `
-      <div class="card mx-3 my-3 px-1 py-1 text-center" id="order-${order.orderID}-product-${item.productID}">
-          <p class="card-text">
-              <b>Product ID:</b> ${item.productID}
-              <b>Quantity:</b> ${item.quantity}
-              <b>Unit Price:</b> $${item.unitPrice} 
-          </p>
-      </div>`;
-  });
+  const orderCard = createOrderCard(order);
+  ordersContainer.appendChild(orderCard);
+  setupOrderItemEventListeners(order);
+  setupPaymentAndCancellation(order, token);
+}
+
+function createOrderCard(order) {
+  const orderItemsHtml = order.orderItems["$values"]
+    .map(
+      (item) => `
+    <div class="card mx-3 my-3 px-1 py-1 text-center" id="order-${order.orderID}-product-${item.productID}">
+      <p class="card-text">
+        <b>Product ID:</b> ${item.productID}
+        <b>Quantity:</b> ${item.quantity}
+        <b>Unit Price:</b> $${item.unitPrice}
+      </p>
+    </div>
+  `
+    )
+    .join("");
+
+  const cancelButtonDisabled = order.status === "Paid" ? "" : "disabled";
+  const payButtonDisabled = order.status === "Cancelled" ? "" : "disabled";
 
   const orderCard = document.createElement("div");
   orderCard.className = "col-md-6 order-card";
   orderCard.innerHTML = `
     <div class="card">
       <div id="card-body" class="card-body">
-        <h5 class="card-title">Order #${order.orderID} </h5>
+        <h5 class="card-title">Order #${order.orderID}</h5>
         <p class="card-text"><b>Date: </b> ${order.orderDate}</p>
-        <p class="card-text"><b>Shipping Address: </b> $${order.shippingAddress}</p>
+        <p class="card-text"><b>Shipping Address: </b> ${order.shippingAddress}</p>
         <p class="card-text"><b>Total: </b> $${order.totalAmount}</p>
         ${orderItemsHtml}
         <p class="text-end" id="status-${order.orderID}"><b>Status: </b> ${order.status}</p>
         <button class="btn btn-danger ${cancelButtonDisabled}" id="cancel-${order.orderID}">Cancel Order</button>
         <button class="btn btn-success ${payButtonDisabled}" id="pay-${order.orderID}">Pay Order</button>
       </div>
-    </div>`;
-
-  ordersContainer.appendChild(orderCard);
-  setupOrderItemEventListeners(order);
-  setupPaymentAndCancellation(order, token);
+    </div>
+  `;
+  return orderCard;
 }
 
 function setupOrderItemEventListeners(order) {

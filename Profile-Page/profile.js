@@ -1,13 +1,12 @@
 // var IP = "http://localhost:8000/api";
-var IP = "https://backend.raghavendiran.cloud/api";
+const IP = "https://backend.raghavendiran.cloud/api";
 
 const token = localStorage.getItem("token");
 const userId = localStorage.getItem("username");
 
 document.addEventListener("DOMContentLoaded", async () => {
   if (!token) {
-    console.error("No token found in localStorage");
-    window.location.href = "../Login-Page/login.html";
+    handleNoToken();
     return;
   }
   if (userId) {
@@ -15,15 +14,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
+function handleNoToken() {
+  console.error("No token found in localStorage");
+  window.location.href = "../Login-Page/login.html";
+}
+
 async function fetchUserData(userId) {
   try {
-    const response = await fetch(`${IP}/UserProfile/ViewProfile?Id=${userId}`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await apiGetRequest(
+      `/UserProfile/ViewProfile?Id=${userId}`
+    );
     if (!response.ok) {
       window.location.href = "../Login-Page/login.html";
     }
@@ -56,15 +56,10 @@ async function updateProfile(event) {
   };
 
   try {
-    const response = await fetch(`${IP}/UserProfile/UpdateProfile`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updatedData),
-    });
-
+    const response = await apiPostRequest(
+      "/UserProfile/UpdateProfile",
+      updatedData
+    );
     if (!response.ok) {
       throw new Error("Failed to update profile");
     }
@@ -74,4 +69,27 @@ async function updateProfile(event) {
   } catch (error) {
     console.error("Error:", error);
   }
+}
+
+async function apiGetRequest(path) {
+  const response = await fetch(`${IP}${path}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+  return response;
+}
+
+async function apiPostRequest(path, data) {
+  const response = await fetch(`${IP}${path}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  return response;
 }

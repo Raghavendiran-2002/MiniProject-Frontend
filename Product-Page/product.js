@@ -2,32 +2,57 @@
 var IP = "https://backend.raghavendiran.cloud/api";
 
 document.addEventListener("DOMContentLoaded", function () {
+  const productId = getProductIdFromUrl();
+  if (!productId) return;
+
+  const token = getTokenFromLocalStorage();
+  if (!token) return;
+
+  fetchProductById(productId, token)
+    .then((product) => {
+      renderProductCard(product);
+      setupCartButtons(product);
+      GetReviews(productId);
+    })
+    .catch((error) => console.error("Error fetching products:", error));
+});
+
+function getProductIdFromUrl() {
   const urlParams = new URLSearchParams(window.location.search);
   const productId = urlParams.get("productId");
   if (!productId) {
     alert("Product ID is missing");
     return;
   }
+  return productId;
+}
+
+function getTokenFromLocalStorage() {
   const token = localStorage.getItem("token");
   if (!token) {
     console.error("No token found in localStorage");
     return;
   }
-  fetch(`${IP}/Product/ById?Id=${productId}`, {
+  return token;
+}
+
+function fetchProductById(productId, token) {
+  return fetch(`${IP}/Product/ById?Id=${productId}`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
-  })
-    .then((response) => response.json())
-    .then((product) => {
-      const container = document.querySelector(".products-container");
+  }).then((response) => response.json());
+}
 
-      const card = document.createElement("div");
-      card.classList.add("container", "my-4");
-      card.innerHTML = `
-      <div class="card">        
+function renderProductCard(product) {
+  const container = document.querySelector(".products-container");
+
+  const card = document.createElement("div");
+  card.classList.add("container", "my-4");
+  card.innerHTML = `
+  <div class="card">        
             <div class="row g-0">
                   <div class="col-md-4">
                     <img src="${
@@ -66,49 +91,49 @@ document.addEventListener("DOMContentLoaded", function () {
                 </div>
             </div>
       </div> `;
-      container.appendChild(card);
-      GetReviews(parseInt(productId));
-      const cartNumberButton = document.getElementById("cartItemNumber");
-      let cartNumber = parseInt(cartNumberButton.innerText);
+  container.appendChild(card);
+}
 
-      document.getElementById("remove").addEventListener("click", function () {
-        document.getElementById("quantity-insufficient").innerText = "";
-        cartNumber = Math.max(0, cartNumber - 1);
-        cartNumberButton.innerText = cartNumber;
+function setupCartButtons(product) {
+  const cartNumberButton = document.getElementById("cartItemNumber");
+  let cartNumber = parseInt(cartNumberButton.innerText);
+
+  document.getElementById("remove").addEventListener("click", function () {
+    document.getElementById("quantity-insufficient").innerText = "";
+    cartNumber = Math.max(0, cartNumber - 1);
+    cartNumberButton.innerText = cartNumber;
+  });
+
+  document
+    .getElementById("addCartToItem")
+    .addEventListener("click", async function () {
+      const response = await fetch(`${IP}/ShoppingCart`, {
+        method: "POST",
+        body: JSON.stringify({
+          userID: parseInt(localStorage.getItem("username")),
+          cartID: parseInt(localStorage.getItem("username")),
+          productID: parseInt(product.productID),
+          quantity: parseInt(cartNumber),
+        }),
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       });
+      const data = await response.json();
+      alert("Successfully Added");
+    });
 
-      document
-        .getElementById("addCartToItem")
-        .addEventListener("click", async function () {
-          const response = await fetch(`${IP}/ShoppingCart`, {
-            method: "POST",
-            body: JSON.stringify({
-              userID: parseInt(localStorage.getItem("username")),
-              cartID: parseInt(localStorage.getItem("username")),
-              productID: parseInt(product.productID),
-              quantity: parseInt(cartNumber),
-            }),
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          });
-          const data = await response.json();
-          alert("Successfully Added");
-        });
-
-      document.getElementById("add").addEventListener("click", function () {
-        if (cartNumber > product.stock) {
-          document.getElementById("quantity-insufficient").innerText =
-            "Quantity is insufficient";
-        } else {
-          cartNumber++;
-        }
-        cartNumberButton.innerText = cartNumber;
-      });
-    })
-    .catch((error) => console.error("Error fetching products:", error));
-});
+  document.getElementById("add").addEventListener("click", function () {
+    if (cartNumber > product.stock) {
+      document.getElementById("quantity-insufficient").innerText =
+        "Quantity is insufficient";
+    } else {
+      cartNumber++;
+    }
+    cartNumberButton.innerText = cartNumber;
+  });
+}
 
 function GetReviews(productId) {
   const token = localStorage.getItem("token");
