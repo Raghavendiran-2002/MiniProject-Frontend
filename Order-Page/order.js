@@ -1,6 +1,7 @@
-// var IP = "http://localhost:8000/api";
+// Define the backend API endpoint
 var IP = "https://backend.raghavendiran.cloud/api";
 
+// Event listener for DOM content loaded
 document.addEventListener("DOMContentLoaded", () => {
   const ordersContainer = document.getElementById("orders-container");
   const token = localStorage.getItem("token");
@@ -11,6 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchOrders(token, ordersContainer);
 });
 
+// Function to fetch orders from the backend
 function fetchOrders(token, ordersContainer) {
   fetch(
     `${IP}/Order/GetUserOrders?userId=${localStorage.getItem("username")}`,
@@ -31,6 +33,7 @@ function fetchOrders(token, ordersContainer) {
     });
 }
 
+// Function to render orders
 function renderOrders(data, ordersContainer, token) {
   ordersContainer.innerHTML = "";
   data["$values"].forEach((order) => {
@@ -38,6 +41,7 @@ function renderOrders(data, ordersContainer, token) {
   });
 }
 
+// Function to render a single order
 function renderOrder(order, ordersContainer, token) {
   const orderCard = createOrderCard(order);
   ordersContainer.appendChild(orderCard);
@@ -45,6 +49,7 @@ function renderOrder(order, ordersContainer, token) {
   setupPaymentAndCancellation(order, token);
 }
 
+// Function to create an order card
 function createOrderCard(order) {
   const orderItemsHtml = order.orderItems["$values"]
     .map(
@@ -82,6 +87,7 @@ function createOrderCard(order) {
   return orderCard;
 }
 
+// Function to set up event listeners for order items
 function setupOrderItemEventListeners(order) {
   order.orderItems["$values"].forEach((item) => {
     document
@@ -90,6 +96,7 @@ function setupOrderItemEventListeners(order) {
   });
 }
 
+// Function to show the review modal
 function reviewProduct(item) {
   var reviewModal = new bootstrap.Modal(
     document.getElementById("reviewModal"),
@@ -100,6 +107,7 @@ function reviewProduct(item) {
     submitReview(e, item, reviewModal);
 }
 
+// Function to submit a review
 function submitReview(e, item, reviewModal) {
   e.preventDefault();
   var reviewText = document.getElementById("reviewText").value;
@@ -138,6 +146,7 @@ function submitReview(e, item, reviewModal) {
     });
 }
 
+// Function to set up payment and cancellation event listeners
 function setupPaymentAndCancellation(order, token) {
   document
     .getElementById(`pay-${order.orderID}`)
@@ -152,6 +161,7 @@ function setupPaymentAndCancellation(order, token) {
     .addEventListener("click", () => cancelOrder(order, token));
 }
 
+// Function to show the payment modal
 function showPaymentModal(order) {
   var myModal = new bootstrap.Modal(document.getElementById("payment"), {
     keyboard: false,
@@ -159,6 +169,7 @@ function showPaymentModal(order) {
   myModal.show();
 }
 
+// Function to place an order
 function placeOrder(order) {
   var form = document.getElementById("payment-form");
   var amountInput = document.getElementById("amount");
@@ -232,6 +243,7 @@ function placeOrder(order) {
   }
 }
 
+// Function to cancel an order
 function cancelOrder(order, token) {
   fetch(`${IP}/Order?orderId=${order.orderID}`, {
     method: "DELETE",

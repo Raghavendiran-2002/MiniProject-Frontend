@@ -1,10 +1,12 @@
 // var IP = "http://localhost:8000/api";
 var IP = "https://backend.raghavendiran.cloud/api";
 
+// Redirect to the landing page if no token is found in local storage
 if (!localStorage.getItem("token")) {
   window.location.href = "../Landing-Page/landing.html";
 }
 
+// Function to log out the user
 async function logout() {
   localStorage.removeItem("token");
   localStorage.removeItem("username");
@@ -12,6 +14,7 @@ async function logout() {
   window.location.href = "../Landing-Page/landing.html";
 }
 
+// Function to search for products
 async function searchProduct(event) {
   event.preventDefault();
   const token = localStorage.getItem("token");
@@ -43,14 +46,17 @@ async function searchProduct(event) {
   }
 }
 
+// Event listener for DOM content loaded
 document.addEventListener("DOMContentLoaded", () => {
   const productGrid = document.getElementById("product-grid");
   const searchBar = document.getElementById("search-bar");
   const categoryGrid = document.getElementById("category-grid");
 
+  // Fetch products and categories
   fetchProducts();
   fetchCategories();
 
+  // Add event listener to search bar
   searchBar.addEventListener("input", (e) => {
     const query = e.target.value;
     if (query.length >= 4) {
@@ -59,6 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+// Function to fetch products
 async function fetchProducts() {
   const token = localStorage.getItem("token");
   if (!token) {
@@ -81,6 +88,7 @@ async function fetchProducts() {
   }
 }
 
+// Function to fetch categories
 async function fetchCategories() {
   const token = localStorage.getItem("token");
   if (!token) {
@@ -103,6 +111,7 @@ async function fetchCategories() {
   }
 }
 
+// Function to display products
 function displayProducts(products) {
   productGrid.innerHTML = "";
   products.forEach((product) => {
@@ -128,6 +137,7 @@ function displayProducts(products) {
   });
 }
 
+// Function to display categories
 function displayCategories(categories) {
   categoryGrid.innerHTML = "";
   categories.forEach((category) => {
@@ -152,6 +162,7 @@ function displayCategories(categories) {
   });
 }
 
+// Function to filter products
 async function filterProducts(query) {
   const token = localStorage.getItem("token");
   if (!token) {

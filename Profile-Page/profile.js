@@ -1,9 +1,11 @@
-// var IP = "http://localhost:8000/api";
+// Define the base URL for the API
 const IP = "https://backend.raghavendiran.cloud/api";
 
+// Retrieve token and userId from localStorage
 const token = localStorage.getItem("token");
 const userId = localStorage.getItem("username");
 
+// Event listener for DOMContentLoaded to check token and fetch user data
 document.addEventListener("DOMContentLoaded", async () => {
   if (!token) {
     handleNoToken();
@@ -14,11 +16,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
+// Redirect to login page if no token is found
 function handleNoToken() {
   console.error("No token found in localStorage");
   window.location.href = "../Login-Page/login.html";
 }
 
+// Fetch user data from the server
 async function fetchUserData(userId) {
   try {
     const response = await apiGetRequest(
@@ -34,6 +38,7 @@ async function fetchUserData(userId) {
   }
 }
 
+// Populate form fields with user data
 function populateFormData(userData) {
   document.getElementById("username").value = userData.username;
   document.getElementById("fullname").value = userData.fullName;
@@ -43,6 +48,7 @@ function populateFormData(userData) {
   document.getElementById("role").value = userData.role;
 }
 
+// Handle form submission to update user profile
 async function updateProfile(event) {
   event.preventDefault();
   const updatedData = {
@@ -71,6 +77,7 @@ async function updateProfile(event) {
   }
 }
 
+// Make a GET request to the API
 async function apiGetRequest(path) {
   const response = await fetch(`${IP}${path}`, {
     method: "GET",
@@ -82,6 +89,7 @@ async function apiGetRequest(path) {
   return response;
 }
 
+// Make a POST request to the API
 async function apiPostRequest(path, data) {
   const response = await fetch(`${IP}${path}`, {
     method: "POST",

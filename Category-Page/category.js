@@ -1,23 +1,31 @@
-// var IP = "http://localhost:8000/api";
+// Define the base URL for the API
 var IP = "https://backend.raghavendiran.cloud/api";
 
+// Event listener for DOM content loaded
 document.addEventListener("DOMContentLoaded", function () {
   const urlParams = new URLSearchParams(window.location.search);
   const categoryId = urlParams.get("categoryId");
+
+  // Check if categoryId is present in the URL
   if (!categoryId) {
     alert("Category ID is missing");
     return;
   }
+
+  // Retrieve the token from local storage
   const token = localStorage.getItem("token");
   if (!token) {
     console.error("No token found in localStorage");
     return;
   }
+
+  // Fetch category details and products
   fetchCategoryDetails(categoryId, token);
   fetchCategoryProducts(categoryId, token);
 });
 
 function fetchCategoryDetails(categoryId, token) {
+  // Fetch category details by ID
   fetch(`${IP}/Category/ById?Id=${categoryId}`, {
     method: "GET",
     headers: {
@@ -33,12 +41,14 @@ function fetchCategoryDetails(categoryId, token) {
 }
 
 function displayCategoryDetails(category) {
+  // Display category details in the DOM
   document.querySelector(".category-container").innerHTML = `
     <h1 class="mb-4">${category.categoryName}</h1>
     <p>${category.description}</p>`;
 }
 
 function fetchCategoryProducts(categoryId, token) {
+  // Fetch products for the given category ID
   fetch(`${IP}/Product/FilterCategoryId?categoryId=${categoryId}`, {
     method: "GET",
     headers: {

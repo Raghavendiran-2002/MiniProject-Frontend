@@ -1,6 +1,7 @@
-// var IP = "http://localhost:8000/api";
+// Define the backend API endpoint
 var IP = "https://backend.raghavendiran.cloud/api";
 
+// Event listener for when the DOM content is fully loaded
 document.addEventListener("DOMContentLoaded", function () {
   const productId = getProductIdFromUrl();
   if (!productId) return;
@@ -17,6 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
     .catch((error) => console.error("Error fetching products:", error));
 });
 
+// Function to get the product ID from the URL
 function getProductIdFromUrl() {
   const urlParams = new URLSearchParams(window.location.search);
   const productId = urlParams.get("productId");
@@ -27,6 +29,7 @@ function getProductIdFromUrl() {
   return productId;
 }
 
+// Function to get the token from local storage
 function getTokenFromLocalStorage() {
   const token = localStorage.getItem("token");
   if (!token) {
@@ -36,6 +39,7 @@ function getTokenFromLocalStorage() {
   return token;
 }
 
+// Function to fetch the product by ID
 function fetchProductById(productId, token) {
   return fetch(`${IP}/Product/ById?Id=${productId}`, {
     method: "GET",
@@ -46,6 +50,7 @@ function fetchProductById(productId, token) {
   }).then((response) => response.json());
 }
 
+// Function to render the product card
 function renderProductCard(product) {
   const container = document.querySelector(".products-container");
 
@@ -94,6 +99,7 @@ function renderProductCard(product) {
   container.appendChild(card);
 }
 
+// Function to set up the cart buttons
 function setupCartButtons(product) {
   const cartNumberButton = document.getElementById("cartItemNumber");
   let cartNumber = parseInt(cartNumberButton.innerText);
@@ -135,6 +141,7 @@ function setupCartButtons(product) {
   });
 }
 
+// Function to get reviews for the product
 function GetReviews(productId) {
   const token = localStorage.getItem("token");
   fetch(`${IP}/Review/product/${productId}`, {

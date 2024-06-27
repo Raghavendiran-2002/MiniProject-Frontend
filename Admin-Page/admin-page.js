@@ -1,37 +1,42 @@
-// var IP = "http://localhost:8000/api";
+// Define the base URL for the API
 var IP = "https://backend.raghavendiran.cloud/api";
 
+// Retrieve the token from local storage
 const token = localStorage.getItem("token");
 
+// Initialize the page when the DOM content is loaded
 document.addEventListener("DOMContentLoaded", initializePage);
 
 function initializePage() {
-  fetchProducts();
-  fetchCategories();
-  setupFormSubmissions();
+  fetchProducts(); // Fetch and display products
+  fetchCategories(); // Fetch and display categories
+  setupFormSubmissions(); // Setup form submission handlers
 }
 
 function setupFormSubmissions() {
+  // Add event listener for product form submission
   document
     .getElementById("productForm")
     .addEventListener("submit", function (event) {
       event.preventDefault();
-      saveProduct();
+      saveProduct(); // Save the product
     });
 }
 
 async function fetchCategories() {
+  // Fetch categories from the API
   const response = await fetch(`${IP}/Category`, {
     method: "GET",
     headers: getAuthHeaders(),
   });
   const categories = await response.json();
-  displayCategories(categories);
+  displayCategories(categories); // Display the fetched categories
 }
 
 function displayCategories(categories) {
   const tableBody = document.getElementById("categoryTableBody");
   tableBody.innerHTML = "";
+  // Iterate over each category and append to the table
   categories["$values"].forEach((category) => {
     const row = document.createElement("tr");
     row.innerHTML = getCategoryRowHtml(category);
@@ -40,6 +45,7 @@ function displayCategories(categories) {
 }
 
 function getCategoryRowHtml(category) {
+  // Return HTML for a category row
   return `
     <td>${category.categoryID}</td>
     <td>${category.categoryName}</td>
@@ -53,17 +59,19 @@ function getCategoryRowHtml(category) {
 }
 
 async function fetchProducts() {
+  // Fetch products from the API
   const response = await fetch(`${IP}/Product`, {
     method: "GET",
     headers: getAuthHeaders(),
   });
   const products = await response.json();
-  displayProducts(products);
+  displayProducts(products); // Display the fetched products
 }
 
 function displayProducts(products) {
   const tableBody = document.getElementById("productTableBody");
   tableBody.innerHTML = "";
+  // Iterate over each product and append to the table
   products["$values"].forEach((product) => {
     const row = document.createElement("tr");
     row.innerHTML = getProductRowHtml(product);
@@ -72,6 +80,7 @@ function displayProducts(products) {
 }
 
 function getProductRowHtml(product) {
+  // Return HTML for a product row
   return `
     <td>${product.productID}</td>
     <td>${product.productName}</td>
@@ -89,6 +98,7 @@ function getProductRowHtml(product) {
 }
 
 function getAuthHeaders() {
+  // Return the authorization headers
   return {
     Authorization: `Bearer ${token}`,
     "Content-Type": "application/json",
@@ -96,16 +106,18 @@ function getAuthHeaders() {
 }
 
 async function openAddModal() {
+  // Reset the product form and fetch categories and discounts
   document.getElementById("productForm").reset();
   document.getElementById("productId").value = "";
   fetchCategoriesAndDiscount();
   const productModal = new bootstrap.Modal(
     document.getElementById("addProductModal")
   );
-  productModal.show();
+  productModal.show(); // Show the add product modal
 }
 
 async function saveProduct() {
+  // Create a product object from form inputs
   const product = {
     productID: document.getElementById("productId").value || null,
     productName: document.getElementById("productName").value,
@@ -117,6 +129,7 @@ async function saveProduct() {
     discountID: document.getElementById("discountId").value,
   };
 
+  // Send a POST request to save the product
   const response = await fetch(`${IP}/Product/AddProduct`, {
     method: "POST",
     headers: getAuthHeaders(),
@@ -124,23 +137,25 @@ async function saveProduct() {
   });
 
   if (response.ok) {
-    fetchProducts();
+    fetchProducts(); // Refresh the product list
     const productModal = bootstrap.Modal.getInstance(
       document.getElementById("productModal")
     );
-    productModal.hide();
+    productModal.hide(); // Hide the modal
   } else {
     alert("Error saving product");
   }
 }
 
 async function editProduct(productID) {
+  // Fetch product details by ID
   const response = await fetch(`${IP}/Product/ById?Id=${productID}`, {
     method: "GET",
     headers: getAuthHeaders(),
   });
   const product = await response.json();
 
+  // Populate the edit form with product details
   document.getElementById("productId").innerHTML = product.productID;
   document.getElementById("editProductName").value = product.productName;
   document.getElementById("editProductDescription").value = product.description;
@@ -150,7 +165,9 @@ async function editProduct(productID) {
   const productModal = new bootstrap.Modal(
     document.getElementById("editProductModal")
   );
-  productModal.show();
+  productModal.show(); // Show the edit product modal
+
+  // Add event listener for edit form submission
   document
     .getElementById("editProductForm")
     .addEventListener("submit", async function (event) {
@@ -169,11 +186,11 @@ async function editProduct(productID) {
         body: JSON.stringify(editProduct),
       });
       if (response.ok) {
-        fetchProducts();
+        fetchProducts(); // Refresh the product list
         const productModal = bootstrap.Modal.getInstance(
           document.getElementById("editProductModal")
         );
-        productModal.hide();
+        productModal.hide(); // Hide the modal
       } else {
         alert("Error editing product");
       }
@@ -285,7 +302,6 @@ async function editCategory(categoryID) {
         description: document.getElementById("editDescription").value,
         imageUrl: document.getElementById("editImageUrl").value,
       };
-      console.log(editCategory);
       const response = await fetch(`${IP}/Category`, {
         method: "PUT",
         headers: getAuthHeaders(),
@@ -298,7 +314,7 @@ async function editCategory(categoryID) {
         );
         categoryModal.hide();
       } else {
-        alert("Error deleting category");
+        alert("Error editing category");
       }
     });
 }

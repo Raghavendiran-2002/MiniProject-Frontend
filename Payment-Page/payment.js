@@ -1,6 +1,7 @@
-// var IP = "http://localhost:8000/api";
+// Define the backend API endpoint
 var IP = "https://backend.raghavendiran.cloud/api";
 
+// Event listener for DOM content loaded
 document.addEventListener("DOMContentLoaded", () => {
   const paymentsContainer = document.getElementById("payments-container");
   const token = localStorage.getItem("token");
@@ -11,6 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchPayments(paymentsContainer, token);
 });
 
+// Function to fetch payments from the backend
 function fetchPayments(paymentsContainer, token) {
   const userId = localStorage.getItem("username");
   const url = `${IP}/Payment/PaymentByUser?userId=${userId}`;
@@ -38,6 +40,7 @@ function fetchPayments(paymentsContainer, token) {
     });
 }
 
+// Function to create a payment card element
 function createPaymentCard(payment) {
   const paymentCard = document.createElement("div");
   paymentCard.className = "col-md-6 my-3 payment-card";

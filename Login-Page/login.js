@@ -1,14 +1,18 @@
+// Define the backend API endpoint
 var IP = "https://backend.raghavendiran.cloud/api";
 
+// Clear local storage when the DOM content is fully loaded
 document.addEventListener("DOMContentLoaded", function () {
   localStorage.clear();
 });
 
+// Function to clear error messages
 function clearErrors() {
   document.getElementById("nameError").innerText = "";
   document.getElementById("passwordError").innerText = "";
 }
 
+// Function to validate the username
 function validateUsername(username) {
   if (username === "") {
     document.getElementById("nameError").innerText = "Username is required.";
@@ -23,6 +27,7 @@ function validateUsername(username) {
   return true;
 }
 
+// Function to validate the password
 function validatePassword(password) {
   if (password === "") {
     document.getElementById("passwordError").innerText =
@@ -38,6 +43,7 @@ function validatePassword(password) {
   return true;
 }
 
+// Function to login the user
 async function loginUser(username, password) {
   try {
     const response = await fetch(`${IP}/UserLoginRegister/Login`, {
@@ -72,6 +78,7 @@ async function loginUser(username, password) {
   }
 }
 
+// Function to validate the form
 async function validateForm(event) {
   event.preventDefault();
 

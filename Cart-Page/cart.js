@@ -1,16 +1,20 @@
-// var IP = "http://localhost:8000/api";
+// Define the base URL for the API
 var IP = "https://backend.raghavendiran.cloud/api";
 
+// Retrieve the username and token from local storage
 const username = localStorage.getItem("username");
 const token = localStorage.getItem("token");
 
+// Initialize an empty array to store order items
 let OrderItem = [];
 
+// Fetch cart items when the DOM content is loaded
 document.addEventListener("DOMContentLoaded", () => {
   fetchCartItems(username);
 });
 
 function fetchCartItems(username) {
+  // Fetch cart items for the given username
   fetch(`${IP}/ShoppingCart/GetCartByUserId?Id=${username}`, {
     method: "GET",
     headers: {
@@ -31,6 +35,7 @@ function populateCart(data) {
 
   let total = 0;
 
+  // Iterate over each item and create a row in the cart
   data.forEach((item) => {
     OrderItem.push({
       productID: item["product"].productID,
@@ -41,6 +46,7 @@ function populateCart(data) {
     total += item.quantity * item["product"].price;
   });
 
+  // Update the total price display
   document.getElementById("total-price").textContent = `Total: $${total.toFixed(
     2
   )}`;
@@ -50,6 +56,7 @@ function createCartItemRow(item) {
   const row = document.createElement("tr");
   row.setAttribute("data-item-id", item.cartItemID);
 
+  // Append cells to the row
   row.appendChild(createImageCell(item));
   row.appendChild(createNameCell(item));
   row.appendChild(createQuantityCell(item));
@@ -118,7 +125,7 @@ function createRemoveCell(item) {
 }
 
 function updateTotalPrice(itemId, newQuantity, cartItemId, inputField) {
-  const token = localStorage.getItem("token");
+  // Update the quantity of a cart item
   fetch(`${IP}/ShoppingCart`, {
     method: "PUT",
     headers: {
@@ -143,6 +150,7 @@ function updateTotalPrice(itemId, newQuantity, cartItemId, inputField) {
 }
 
 function removeItem(itemId) {
+  // Remove an item from the cart
   fetch(`${IP}/ShoppingCart?cartId=${itemId}`, {
     method: "DELETE",
     headers: {
@@ -167,6 +175,7 @@ function removeItem(itemId) {
 }
 
 function updateTotalPriceDisplay() {
+  // Update the total price display after removing an item
   let total = 0;
   document.querySelectorAll("#cart-items tr").forEach((row) => {
     const priceCell = row.children[3];
@@ -182,6 +191,7 @@ function updateTotalPriceDisplay() {
   )}`;
 }
 
+// Add event listener for placing an order
 document
   .getElementById("place-order-now")
   .addEventListener("click", function () {
@@ -193,6 +203,7 @@ document
   });
 
 function placeOrder() {
+  // Place an order with the current cart items
   fetch(`${IP}/Order?userId=${username}`, {
     method: "POST",
     headers: {
@@ -234,6 +245,7 @@ function placeOrder() {
 }
 
 function removeCartItem(itemId) {
+  // Remove the cart items after placing an order
   fetch(`${IP}/ShoppingCart/DeleteCartByUserId?Id=${itemId}`, {
     method: "DELETE",
     headers: {

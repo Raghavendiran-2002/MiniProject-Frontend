@@ -1,6 +1,7 @@
 // var IP="http://localhost:8000/api";
 var IP = "https://backend.raghavendiran.cloud/api";
 
+// Function to clear all error messages
 function clearErrors() {
   document.getElementById("nameError").innerText = "";
   document.getElementById("passwordError").innerText = "";
@@ -10,6 +11,7 @@ function clearErrors() {
   document.getElementById("roleError").innerText = "";
 }
 
+// Function to validate a field and display an error message if the condition is met
 function validateField(fieldId, errorId, errorMessage, condition) {
   if (condition) {
     document.getElementById(errorId).innerText = errorMessage;
@@ -19,6 +21,7 @@ function validateField(fieldId, errorId, errorMessage, condition) {
   return true;
 }
 
+// Function to validate the entire form and submit the data if valid
 async function validateForm(event) {
   event.preventDefault();
 
@@ -34,6 +37,7 @@ async function validateForm(event) {
 
   let isValid = true;
 
+  // Validate fullname
   isValid =
     validateField(
       "fullname",
@@ -41,6 +45,8 @@ async function validateForm(event) {
       "Fullname is required.",
       fullname === ""
     ) && isValid;
+
+  // Validate email
   let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   isValid =
     validateField("email", "emailError", "Email is required.", email === "") &&
@@ -52,6 +58,8 @@ async function validateForm(event) {
       "Enter a valid email.",
       !emailRegex.test(email)
     ) && isValid;
+
+  // Validate address
   isValid =
     validateField(
       "address",
@@ -59,6 +67,8 @@ async function validateForm(event) {
       "Address is required.",
       address === ""
     ) && isValid;
+
+  // Validate phone number
   let phoneRegex = /^[0-9]{10}$/;
   isValid =
     validateField(
@@ -74,6 +84,8 @@ async function validateForm(event) {
       "Enter a valid 10-digit phone number",
       !phoneRegex.test(phonenumber)
     ) && isValid;
+
+  // Validate username
   isValid =
     validateField(
       "username",
@@ -88,6 +100,8 @@ async function validateForm(event) {
       "Username must be at least 5 characters long.",
       username.length < 5
     ) && isValid;
+
+  // Validate password
   isValid =
     validateField(
       "password",
@@ -102,6 +116,8 @@ async function validateForm(event) {
       "Password must be at least 8 characters long.",
       password.length < 8
     ) && isValid;
+
+  // Validate role
   isValid =
     validateField("role", "roleError", "Role is required.", role === "") &&
     isValid;
